@@ -4,53 +4,75 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class Main {
-    static void quickSort(List<Conta> contas, int low, int high) {
+
+    public static void main(String[] args) throws Exception {
+        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\quickSortCPF\\conta500.txt");
+        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\quickSortCPF\\conta1000.txt");
+        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\quickSortCPF\\conta5000.txt");
+        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\quickSortCPF\\conta10000.txt");
+        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\quickSortCPF\\conta50000.txt");
+    }
+
+    public static void sortFile(String fileName) throws Exception {
+        BufferedReader reader = new BufferedReader(new FileReader(fileName));
+        String line;
+        String[] records = new String[50000];
+        int count = 0;
+
+        while ((line = reader.readLine()) != null) {
+            records[count++] = line;
+        }
+
+        reader.close();
+
+        quicksort(records, 0, count - 1);
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName+"_OK"));
+
+        for (int i = 0; i < count; i++) {
+            writer.write(records[i]);
+            writer.newLine();
+        }
+
+        writer.close();
+    }
+
+    public static void quicksort(String[] records, int low, int high) {
         if (low < high) {
-            int pi = partition(contas, low, high);
-            quickSort(contas, low, pi - 1);
-            quickSort(contas, pi + 1, high);
+            int pivotIndex = partition(records, low, high);
+            quicksort(records, low, pivotIndex - 1);
+            quicksort(records, pivotIndex + 1, high);
         }
     }
 
-    static int partition(List<Conta> contas, int low, int high) {
-        Conta pivot = contas.get(high);
-        int i = (low - 1);
-        for (int j = low; j <= high - 1; j++) {
-            if (contas.get(j).compareTo(pivot) < 0) {
+    public static int partition(String[] records, int low, int high) {
+        String pivot = records[high];
+        int i = low - 1;
+
+        for (int j = low; j < high; j++) {
+            if (compare(records[j], pivot) <= 0) {
                 i++;
-                Collections.swap(contas, i, j);
+                swap(records, i, j);
             }
         }
-        Collections.swap(contas, i + 1, high);
-        return (i + 1);
+
+        swap(records, i + 1, high);
+
+        return i + 1;
     }
 
-    public static void main(String[] args) {
-        List<Conta> contas = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("input.txt"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(";");
-                contas.add(new Conta(parts[0], parts[1], parts[3], Double.parseDouble(parts[2])));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void swap(String[] records, int i, int j) {
+        String temp = records[i];
+        records[i] = records[j];
+        records[j] = temp;
+    }
 
-        quickSort(contas, 0, contas.size() - 1);
+    public static int compare(String record1, String record2) {
+        String cpf1 = record1.split(";")[3];
+        String cpf2 = record2.split(";")[3];
 
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("output.txt"))) {
-            for (Conta conta : contas) {
-                bw.write(conta.agencia + ";" + conta.numero + ";" + conta.saldo + ";" + conta.cpf);
-                bw.newLine();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return cpf1.compareTo(cpf2);
     }
 }

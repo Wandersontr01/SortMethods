@@ -1,48 +1,72 @@
 package sarrussys.main.shellSortCPF;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 public class Main {
-    public static void main(String[] args) {
-        String fileName = "C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\shellSortCPF\\conta500.txt";
 
-        List<Conta> contas = new ArrayList<>();
-        try (Stream<String> lines = Files.lines(Paths.get(fileName))) {
-            lines.map(line -> line.split(";"))
-                    .forEach(parts -> contas.add(new Conta(parts[0], parts[1], parts[3], Double.parseDouble(parts[2]))));
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static void main(String[] args) throws Exception {
+        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\shellSortCPF\\conta500.txt");
+        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\shellSortCPF\\conta1000.txt");
+        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\shellSortCPF\\conta5000.txt");
+        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\shellSortCPF\\conta10000.txt");
+        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\shellSortCPF\\conta50000.txt");
+    }
+
+    public static void sortFile(String fileName) throws Exception {
+        // Ler o arquivo
+        BufferedReader reader = new BufferedReader(new FileReader(fileName));
+        String line;
+        String[] records = new String[50000];
+        int count = 0;
+
+        while ((line = reader.readLine()) != null) {
+            records[count++] = line;
         }
 
-        shellSort(contas);
+        reader.close();
 
-        try {
-            Files.write(Paths.get("saida.txt"),
-                    contas.stream()
-                            .map(conta -> conta.agencia + ";" + conta.numero + ";" + conta.saldo + ";" + conta.cpf)
-                            .collect(Collectors.toList())
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
+        shellsort(records, count);
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName+"_OK"));
+
+        for (int i = 0; i < count; i++) {
+            writer.write(records[i]);
+            writer.newLine();
+        }
+
+        writer.close();
+    }
+
+    public static void shellsort(String[] records, int n) {
+        int h = 1;
+
+        while (h < n / 3) {
+            h = 3 * h + 1;
+        }
+
+        while (h >= 1) {
+            for (int i = h; i < n; i++) {
+                for (int j = i; j >= h && compare(records[j], records[j - h]) < 0; j -= h) {
+                    swap(records, j, j - h);
+                }
+            }
+            h = h / 3;
         }
     }
 
-    static void shellSort(List<Conta> contas) {
-        int n = contas.size();
-        for (int dif = n/2; dif > 0; dif /= 2) {
-            for (int i = dif; i < n; i += 1) {
-                Conta temp = contas.get(i);
-                int j;
-                for (j = i; j >= dif && contas.get(j - dif).compareTo(temp) > 0; j -= dif) {
-                    contas.set(j, contas.get(j - dif));
-                }
-                contas.set(j, temp);
-            }
-        }
+    public static void swap(String[] records, int i, int j) {
+        String temp = records[i];
+        records[i] = records[j];
+        records[j] = temp;
+    }
+
+    public static int compare(String record1, String record2) {
+        String cpf1 = record1.split(";")[3];
+        String cpf2 = record2.split(";")[3];
+
+        return cpf1.compareTo(cpf2);
     }
 }
