@@ -1,5 +1,7 @@
 package sarrussys.main.quickSortCPF;
 
+import sarrussys.main.FilePath;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -8,11 +10,11 @@ import java.io.FileWriter;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\quickSortCPF\\conta500.txt");
-        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\quickSortCPF\\conta1000.txt");
-        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\quickSortCPF\\conta5000.txt");
-        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\quickSortCPF\\conta10000.txt");
-        sortFile("C:\\Users\\Detemann\\Documents\\Projetos\\ASAQV\\src\\main\\java\\sarrussys\\main\\quickSortCPF\\conta50000.txt");
+        sortFile(FilePath.file500.getFilePath());
+        sortFile(FilePath.file1000.getFilePath());
+        sortFile(FilePath.file5000.getFilePath());
+        sortFile(FilePath.file10000.getFilePath());
+        sortFile(FilePath.file50000.getFilePath());
     }
 
     public static void sortFile(String fileName) throws Exception {
