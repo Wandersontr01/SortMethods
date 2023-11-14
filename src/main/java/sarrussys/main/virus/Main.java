@@ -1,19 +1,34 @@
-package sarrussys.main.arvoreABB;
+package sarrussys.main.virus;
+
+import sarrussys.main.FilePath;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 
 public class Main {
     public static void main(String[] args) {
-        Arvore abb = new Arvore();
+        ABB abb = new ABB();
 
-        // Carregar registros dos arquivos
-        carregarRegistros(abb, "arquivo_500.txt");
+        String filePath = FilePath.file50000.getFilePath();
+
+        carregarRegistros(abb, filePath);
         abb.balancear();
-        abb.pesquisaECriaArquivo(new String[]{"11122233345", "44422233345"});
+
+        String[] cpfsPesquisa = lerCPFsDeArquivo(filePath);
+
+        abb.pesquisaECriaArquivos(cpfsPesquisa);
     }
 
-    private static void carregarRegistros(Arvore abb, String nomeArquivo) {
+    private static String[] lerCPFsDeArquivo(String nomeArquivo) {
+        try (BufferedReader br = new BufferedReader(new FileReader(nomeArquivo))) {
+            return br.lines().toArray(String[]::new);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new String[0];
+        }
+    }
+
+    private static void carregarRegistros(ABB abb, String nomeArquivo) {
         try (BufferedReader br = new BufferedReader(new FileReader(nomeArquivo))) {
             String linha;
             while ((linha = br.readLine()) != null) {
