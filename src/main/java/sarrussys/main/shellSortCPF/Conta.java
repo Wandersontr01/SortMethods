@@ -1,4 +1,6 @@
-package sarrussys.main.quickSortCPF;
+package sarrussys.main.shellSortCPF;
+
+import java.util.Comparator;
 
 class Conta implements Comparable<Conta> {
     String agencia;
@@ -47,16 +49,9 @@ class Conta implements Comparable<Conta> {
 
     @Override
     public int compareTo(Conta other) {
-        int cpfCompare = this.cpf.compareTo(other.cpf);
-        if (cpfCompare != 0) {
-            return cpfCompare;
-        } else {
-            int agenciaCompare = this.agencia.compareTo(other.agencia);
-            if (agenciaCompare != 0) {
-                return agenciaCompare;
-            } else {
-                return this.numero.compareTo(other.numero);
-            }
-        }
+        return Comparator.comparing(Conta::getCpf)
+                .thenComparing(Conta::getAgencia)
+                .thenComparing(Conta::getNumero)
+                .compare(this, other);
     }
 }
