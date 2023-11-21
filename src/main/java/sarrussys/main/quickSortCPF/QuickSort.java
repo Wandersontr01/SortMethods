@@ -7,14 +7,11 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 
-public class Main {
+public class QuickSort {
 
     public static void main(String[] args) throws Exception {
         sortFile(FilePath.file500.getFilePath());
-        sortFile(FilePath.file1000.getFilePath());
-        sortFile(FilePath.file5000.getFilePath());
-        sortFile(FilePath.file10000.getFilePath());
-        sortFile(FilePath.file50000.getFilePath());
+
     }
 
     public static void sortFile(String fileName) throws Exception {
@@ -54,7 +51,8 @@ public class Main {
         int i = low - 1;
 
         for (int j = low; j < high; j++) {
-            if (compare(records[j], pivot) <= 0) {
+            int cmp = compareCPFs(records[j], pivot);
+            if (cmp <= 0) {
                 i++;
                 swap(records, i, j);
             }
@@ -71,10 +69,18 @@ public class Main {
         records[j] = temp;
     }
 
-    public static int compare(String record1, String record2) {
+    public static int compareCPFs(String record1, String record2) {
         String cpf1 = record1.split(";")[3];
         String cpf2 = record2.split(";")[3];
 
-        return cpf1.compareTo(cpf2);
+        int cmp = cpf1.compareTo(cpf2);
+
+        if (cmp == 0) {
+            // Em caso de empate no CPF, manter a ordenação pela agência e número da conta
+            System.out.println("CPFs iguais: " + cpf1 + " e " + cpf2);
+        } else {
+            return cmp;
+        }
+        return cmp;
     }
 }
