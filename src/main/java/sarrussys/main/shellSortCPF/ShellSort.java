@@ -1,6 +1,7 @@
-package sarrussys.main.quickSortCPF;
+package sarrussys.main.shellSortCPF;
 
 import sarrussys.main.FilePath;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -8,15 +9,15 @@ import java.io.FileWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class QuickSort {
+public class ShellSort {
 
-    public QuickSort(FilePath filePath) throws Exception {
+    public ShellSort(FilePath filePath) throws Exception {
         sortFile(filePath.getFilePath());
     }
 
     public static void sortFile(String fileName) throws Exception {
         Path inputPath = Paths.get(fileName);
-        Path outputPath = inputPath.resolveSibling("RESULTADOS_QUICKSORT").resolve(inputPath.getFileName().toString());
+        Path outputPath = inputPath.resolveSibling("RESULTADOS_SHELLSORT").resolve(inputPath.getFileName().toString());
 
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName));
              BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toString()))) {
@@ -31,42 +32,33 @@ public class QuickSort {
 
             reader.close();
 
-            quicksort(records, 0, count - 1);
+            shellsort(records, count);
 
             for (int i = 0; i < count; i++) {
                 writer.write(records[i]);
                 writer.newLine();
             }
 
-            writer.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void quicksort(String[] records, int low, int high) {
-        if (low < high) {
-            int pivotIndex = partition(records, low, high);
-            quicksort(records, low, pivotIndex - 1);
-            quicksort(records, pivotIndex + 1, high);
+    public static void shellsort(String[] records, int count) {
+        int h = 1;
+
+        while (h < count / 3) {
+            h = 3 * h + 1;
         }
-    }
 
-    public static int partition(String[] records, int low, int high) {
-        String pivot = records[high];
-        int i = low - 1;
-
-        for (int j = low; j < high; j++) {
-            int cmp = compareCPFs(records[j], pivot);
-            if (cmp <= 0) {
-                i++;
-                swap(records, i, j);
+        while (h >= 1) {
+            for (int i = h; i < count; i++) {
+                for (int j = i; j >= h && compareCPFs(records[j - h], records[j]) > 0; j -= h) {
+                    swap(records, j, j - h);
+                }
             }
+            h = h / 3;
         }
-
-        swap(records, i + 1, high);
-
-        return i + 1;
     }
 
     public static void swap(String[] records, int i, int j) {
