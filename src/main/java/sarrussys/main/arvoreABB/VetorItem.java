@@ -1,5 +1,7 @@
 package sarrussys.main.arvoreABB;
 
+import sarrussys.main.models.Item;
+
 public class VetorItem {
     private Item[] vetor;
     private int tamanho;

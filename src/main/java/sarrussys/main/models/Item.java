@@ -1,4 +1,4 @@
-package sarrussys.main.arvoreABB;
+package sarrussys.main.models;
 
 import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
