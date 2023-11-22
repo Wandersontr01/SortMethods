@@ -1,5 +1,7 @@
 package sarrussys.main.arvoreABB;
 
+import sarrussys.main.models.Item;
+
 public class NoABB {
     private Item item;
     private NoABB esq, dir;

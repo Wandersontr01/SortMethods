@@ -1,31 +1,29 @@
-package sarrussys.main.arvoreABB;
+package sarrussys.main.arvoreAVL;
 
 import sarrussys.main.FilePath;
-import sarrussys.main.models.Item;;
+import sarrussys.main.models.Item;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class InitABB {
-    public static int tamanho = 0;
-    public InitABB(FilePath flp){
+public class InitAVL {
+    public InitAVL(FilePath flp){
         try{
-            // Carregar dados para a ABB
-            ArvoreABB arvoreABB = new ArvoreABB();
+            // Carregar dados para a AVL
+            ArvoreAVL arvoreAVL = new ArvoreAVL();
             String filePath = flp.getFilePath();
             String cpfFilePath = FilePath.filecpfs.getFilePath();
 
-            carregarDados(filePath, arvoreABB);
-            arvoreABB.balancear();
+            carregarDados(filePath, arvoreAVL);
 
-            // Criar arquivo único para resultados dentro da pasta RESULTADOS_ARVOREABB
+            // Criar arquivo único para resultados dentro da pasta RESULTADOS_ARVOREAVL
             String nomeArquivo = flp.getNome();
-            String caminhoResultado = "src/main/resources/RESULTADOS_ARVOREABB/" + nomeArquivo + ".txt";
+            String caminhoResultado = "src/main/resources/RESULTADOS_ARVOREAVL/" + nomeArquivo + ".txt";
 
             FileWriter resultadoFile = new FileWriter(caminhoResultado);
-            pesquisarCPFs(cpfFilePath, arvoreABB, resultadoFile);
+            pesquisarCPFs(cpfFilePath, arvoreAVL, resultadoFile);
 
             resultadoFile.close();
 
@@ -36,41 +34,36 @@ public class InitABB {
 
     }
 
-    private static void pesquisarCPFs(String arquivoCPFs, ArvoreABB abb, FileWriter resultadoFile) throws IOException {
+    private static void pesquisarCPFs(String arquivoCPFs, ArvoreAVL avl, FileWriter resultadoFile) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(arquivoCPFs));
         String linha;
 
         while ((linha = reader.readLine()) != null) {
-            abb.pesquisarCpf(linha.trim(), resultadoFile);
+            avl.pesquisarCpf(linha.trim(), resultadoFile);
         }
 
         // Fechar o leitor de arquivo de CPFs
         reader.close();
     }
 
-    private static void carregarDados(String arquivo, ArvoreABB arvoreABB) throws IOException {
+    private static void carregarDados(String arquivo, ArvoreAVL arvoreAVL) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(arquivo));
-
         String linha;
 
         while ((linha = reader.readLine()) != null) {
             String[] dados = linha.split(";");
 
             if (dados.length == 4) {
-                tamanho++;
                 String cpf = dados[3];
                 String agencia = dados[0];
                 String numero = dados[1];
                 String saldo = dados[2];
 
-
                 Item item = new Item(cpf,agencia,numero,saldo);
 
-
-                arvoreABB.inserir(item);
+                arvoreAVL.inserir(item);
             }
         }
         reader.close();
     }
-
 }
