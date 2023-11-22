@@ -1,41 +1,48 @@
 package sarrussys.main.quickSortCPF;
 
 import sarrussys.main.FilePath;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class QuickSort {
+    private FilePath filePath;
 
-    public static void main(String[] args) throws Exception {
-        sortFile(FilePath.file500.getFilePath());
-
+    public QuickSort(FilePath filePath) throws Exception {
+        sortFile(filePath.getFilePath());
     }
 
     public static void sortFile(String fileName) throws Exception {
-        BufferedReader reader = new BufferedReader(new FileReader(fileName));
-        String line;
-        String[] records = new String[50000];
-        int count = 0;
+        Path inputPath = Paths.get(fileName);
+        Path outputPath = inputPath.resolveSibling("RESULTADOS").resolve(inputPath.getFileName().toString());
 
-        while ((line = reader.readLine()) != null) {
-            records[count++] = line;
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toString()))) {
+
+            String line;
+            String[] records = new String[50000];
+            int count = 0;
+
+            while ((line = reader.readLine()) != null) {
+                records[count++] = line;
+            }
+
+            reader.close();
+
+            quicksort(records, 0, count - 1);
+
+            for (int i = 0; i < count; i++) {
+                writer.write(records[i]);
+                writer.newLine();
+            }
+
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        reader.close();
-
-        quicksort(records, 0, count - 1);
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName+"_OK"));
-
-        for (int i = 0; i < count; i++) {
-            writer.write(records[i]);
-            writer.newLine();
-        }
-
-        writer.close();
     }
 
     public static void quicksort(String[] records, int low, int high) {
@@ -70,17 +77,21 @@ public class QuickSort {
     }
 
     public static int compareCPFs(String record1, String record2) {
-        String cpf1 = record1.split(";")[3];
-        String cpf2 = record2.split(";")[3];
+        String[] fields1 = record1.split(";");
+        String[] fields2 = record2.split(";");
 
-        int cmp = cpf1.compareTo(cpf2);
+        String cpf1 = fields1[3];
+        String cpf2 = fields2[3];
 
-        if (cmp == 0) {
-            // Em caso de empate no CPF, manter a ordenação pela agência e número da conta
-            System.out.println("CPFs iguais: " + cpf1 + " e " + cpf2);
-        } else {
-            return cmp;
+        int cpfComparison = cpf1.compareTo(cpf2);
+
+        // Se os CPFs são iguais, compare pela agência e número da conta
+        if (cpfComparison == 0) {
+            String account1 = fields1[1] + fields1[2]; // Agência + Número da conta
+            String account2 = fields2[1] + fields2[2];
+            return account1.compareTo(account2);
         }
-        return cmp;
+
+        return cpfComparison;
     }
 }
