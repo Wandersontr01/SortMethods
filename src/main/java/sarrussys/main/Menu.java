@@ -1,8 +1,8 @@
 package sarrussys.main;
 
-import sarrussys.main.arvoreABB.ArvoreABB;
 import sarrussys.main.quickSortCPF.QuickSort;
 import sarrussys.main.shellSortCPF.ShellSort;
+import sarrussys.main.arvoreABB.InitABB;
 
 public class Menu {
 
@@ -15,7 +15,8 @@ public class Menu {
 
         new QuickSort(conta500);
         new ShellSort(conta500);
-        new ArvoreABB(conta500);
+
+        new InitABB(conta1k);
 
 
     }
