@@ -17,9 +17,14 @@ public class ArvoreAVL {
         this.raiz = null;
         this.quant = 0;
     }
+
+    public NoAVL getRaiz() {
+        return raiz;
+    }
+
     /*
-        INSERIR
-     */
+            INSERIR
+         */
     public void inserir (Item item){
         this.raiz = this.inserir (item, this.raiz);
     }
@@ -30,7 +35,7 @@ public class ArvoreAVL {
             this.h = true;
             return novo;
         } else {
-            if (item.getChave() < no.getItem().getChave()) {
+            if (item.getChave().compareTo(no.getItem().getChave()) < 0) {
                 // Insere à esquerda e verifica se precisa
                 // balancear à direita
                 no.setEsq(this.inserir(item, no.getEsq()));
@@ -49,15 +54,15 @@ public class ArvoreAVL {
         PESQUISAR
      */
 
-    public NoAVL pesquisar (Long chave) {
+    public NoAVL pesquisar (String chave) {
         return pesquisar (chave, this.raiz);
     }
-    private NoAVL pesquisar (Long chave, NoAVL no) {
+    private NoAVL pesquisar (String chave, NoAVL no) {
         if (no == null) {
             return null;
         } else if (Objects.equals(chave, no.getItem().getChave())) {
             return no;
-        } else if (chave > no.getItem().getChave()) {
+        } else if (chave.compareTo(no.getItem().getChave()) > 0) {
             return pesquisar(chave, no.getDir());
         } else {
             return pesquisar(chave, no.getEsq());
@@ -164,47 +169,28 @@ public class ArvoreAVL {
         return no;
     }
 
-    private double pesquisarCpfRec(NoAVL no, String cpf, FileWriter resultadoFile) throws IOException {
+    // Método para obter os nós em ordem e INSERIR em um vetor
+    public NoAVL[] percorrerEmOrdem() {
+        NoAVL[] vetorNos = new NoAVL[contarNos(raiz)]; // Tamanho do vetor é o número total de nós
+        int[] indice = {0}; // Usado para rastrear a posição atual no vetor
+        percorrerEmOrdemRecursivo(raiz, vetorNos, indice);
+        return vetorNos;
+    }
+
+    private void percorrerEmOrdemRecursivo(NoAVL no, NoAVL[] vetorNos, int[] indice) {
+        if (no != null) {
+            percorrerEmOrdemRecursivo(no.getEsq(), vetorNos, indice);
+            vetorNos[indice[0]++] = no;
+            percorrerEmOrdemRecursivo(no.getDir(), vetorNos, indice);
+        }
+    }
+
+    // Método para contar o número total de nós na árvore
+    public int contarNos(NoAVL no) {
         if (no == null) {
-            resultadoFile.write("CPF " + cpf + ":\nINEXISTENTE\n\n");
-            return 0.0;  // Retorna 0.0 se o CPF não for encontrado
+            return 0;
         }
-
-        double saldoTotal = 0.0;
-
-        if (parseLong(cpf) < no.getItem().getChave()) {
-            saldoTotal += pesquisarCpfRec(no.getEsq(), cpf, resultadoFile);
-        } else if (parseLong(cpf) > no.getItem().getChave()) {
-            saldoTotal += pesquisarCpfRec(no.getDir(), cpf, resultadoFile);
-        } else {
-            // CPF encontrado
-            resultadoFile.write("CPF " + cpf + ":\n");
-            saldoTotal += escreverInformacoes(no, resultadoFile);
-            resultadoFile.write("Saldo Total: " + saldoTotal + "\n\n");
-        }
-
-        return saldoTotal;
-    }
-
-    public void pesquisarCpf(String cpf, FileWriter resultadoFile) throws IOException {
-        pesquisarCpfRec(raiz, cpf, resultadoFile);
-    }
-
-    private double escreverInformacoes(NoAVL no, FileWriter resultadoFile) throws IOException {
-        double saldoTotal = no.getItem().getSaldo();
-
-        resultadoFile.write("Agencia: " + no.getItem().getAgencia()+
-                " Conta: " + no.getItem().getNumero()+
-                " Saldo: " + no.getItem().getSaldo() + "\n");
-
-        if (no.getEsq() != null) {
-            saldoTotal += escreverInformacoes(no.getEsq(), resultadoFile);
-        }
-        if (no.getDir() != null) {
-            saldoTotal += escreverInformacoes(no.getDir(), resultadoFile);
-        }
-
-        return saldoTotal;
+        return 1 + contarNos(no.getEsq()) + contarNos(no.getDir());
     }
 
 }

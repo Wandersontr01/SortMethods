@@ -5,19 +5,19 @@ import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
 
 public class Item {
-    private Long cpf;
+    private String cpf;
     private String agencia;
     private String numero;
     private double saldo;
 
     public Item(String cpf, String agencia, String numero, String saldo){
-        this.cpf = parseLong(cpf);
+        this.cpf = cpf;
         this.agencia = agencia;
         this.numero = numero;
         this.saldo = parseDouble(saldo);
     }
 
-    public Long getChave() {
+    public String getChave() {
         return cpf;
     }
 
@@ -33,7 +33,7 @@ public class Item {
         return saldo;
     }
 
-    public void setCpf(Long cpf) {
+    public void setCpf(String cpf) {
         this.cpf = cpf;
     }
 

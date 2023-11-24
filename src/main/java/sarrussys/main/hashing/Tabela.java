@@ -1,5 +1,7 @@
 package sarrussys.main.hashing;
 
+import java.util.Arrays;
+
 public class Tabela {
     private static final int tamanho_tabela = 557;
     private NoHash[] tabela;
@@ -45,5 +47,7 @@ public class Tabela {
         return null;
     }
 
-
+    public int getTamanho_tabela(){
+        return this.getTamanho_tabela();
+    }
 }

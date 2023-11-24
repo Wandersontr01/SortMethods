@@ -34,7 +34,7 @@ public class Menu {
             switch (op) {
                 case 1:
                     System.out.println("Você escolheu Rodar QuickSort");
-                    new QuickSort(conta500);
+                    new QuickSort(conta50k);
                     break;
                 case 2:
                     System.out.println("Você escolheu Rodar ShellSort");
@@ -42,7 +42,7 @@ public class Menu {
                     break;
                 case 3:
                     System.out.println("Você escolheu Rodar Árvore ABB");
-                    new InitABB(conta1k);
+                    new InitABB(conta500);
                     break;
                 case 4:
                     System.out.println("Você escolheu Rodar Árvore AVL");
@@ -50,7 +50,7 @@ public class Menu {
                     break;
                 case 5:
                     System.out.println("Você escolheu Rodar Hashing");
-                    //new InitHash(conta500);
+                    new InitHash(conta500);
                     break;
                 case 0:
                     System.out.println("Saindo do programa.");
@@ -60,6 +60,6 @@ public class Menu {
             }
         } while (op != 0);
 
-        scanner.close();
+        sc.close();
     }
 }
