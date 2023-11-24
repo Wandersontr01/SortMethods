@@ -1,6 +1,7 @@
 package sarrussys.main;
 
 import sarrussys.main.arvoreAVL.InitAVL;
+import sarrussys.main.hashing.InitHash;
 import sarrussys.main.quickSortCPF.QuickSort;
 import sarrussys.main.shellSortCPF.ShellSort;
 import sarrussys.main.arvoreABB.InitABB;
@@ -60,6 +61,5 @@ public class Menu {
         } while (op != 0);
 
         scanner.close();
-
     }
 }
