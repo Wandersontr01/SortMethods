@@ -17,7 +17,7 @@ public class QuickSort {
     public static void sortFile(String fileName) throws Exception {
         Path inputPath = Paths.get(fileName);
         Path outputPath = inputPath.resolveSibling("RESULTADOS_QUICKSORT").resolve(inputPath.getFileName().toString());
-
+////
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName));
              BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toString()))) {
 

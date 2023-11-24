@@ -20,9 +20,6 @@ public class InitHash {
             // Carregar registros do arquivo
             carregarRegistros(tabela, flp.getFilePath());
 
-
-
-
             // Realizar pesquisas com base nos CPFs fornecidos
             pesquisarEGravarResultados(tabela, cpfFilePath, resultadoFile);
         } catch (Exception e) {
@@ -46,19 +43,22 @@ public class InitHash {
         }
     }
 
-    private static void pesquisarEGravarResultados(Tabela tabelaHash, String nomeArquivoCpf, FileWriter resultadoFile) {
-        try (BufferedReader br = new BufferedReader(new FileReader(nomeArquivoCpf));
+    private static void pesquisarEGravarResultados(Tabela tabelaHash, String cpfFilePath, FileWriter resultadoFile) {
+        try (BufferedReader br = new BufferedReader(new FileReader(cpfFilePath));
              FileWriter fw = resultadoFile) {
 
             String linha;
             while ((linha = br.readLine()) != null) {
                 String cpfParaPesquisar = linha.trim();
+
                 NoHash resultado = tabelaHash.buscar(cpfParaPesquisar);
+
 
                 fw.write("CPF " + cpfParaPesquisar + ":\n");
                 if (resultado != null) {
                     double saldoTotal = 0;
                     while (resultado != null && resultado.cpf.equals(cpfParaPesquisar)) {
+
                         fw.write("Agencia: " + resultado.agencia + " Conta: " + resultado.conta + " Saldo: " + resultado.saldo+"\n");
                         saldoTotal += resultado.saldo;
                         resultado = resultado.proximo;

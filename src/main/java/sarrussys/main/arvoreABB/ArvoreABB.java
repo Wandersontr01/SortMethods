@@ -1,6 +1,5 @@
 package sarrussys.main.arvoreABB;
 
-
 import sarrussys.main.models.Item;
 
 import java.io.FileWriter;
@@ -29,20 +28,15 @@ public class ArvoreABB {
     }
 
     public boolean inserir (Item item) {
-        NoABB aux = pesquisar (item.getChave());
-        if (aux != null) {
-            return false;
-        } else {
-            this.raiz = inserir (item, this.raiz);
-            return true;
-        }
+        this.raiz = inserir (item, this.raiz);
+        return true;
     }
 
     private NoABB inserir (Item item, NoABB no) {
         if (no==null) {
             no = new NoABB(item);
             this.quant++;
-        } else if (item.getChave()>no.getItem().getChave()) {
+        } else if ((item.getChave().compareTo(no.getItem().getChave()) > 0)) {
             no.setDir(inserir (item, no.getDir()));
         } else {
             no.setEsq(inserir (item, no.getEsq()));
@@ -51,15 +45,15 @@ public class ArvoreABB {
     }
 
 
-    public void remover (int chave) {
+    public void remover (String chave) {
         this.remover(chave, this.raiz);
     }
-    private NoABB remover (int chave, NoABB no) {
+    private NoABB remover (String chave, NoABB no) {
         if (no == null) {
             return null;
-        } else if (chave > no.getItem().getChave()) {
+        } else if ((chave.compareTo(no.getItem().getChave()) > 0)) {
             no.setDir(remover(chave, no.getDir()));
-        } else if (chave < no.getItem().getChave()) {
+        } else if ((chave.compareTo(no.getItem().getChave()) < 0)) {
             no.setEsq(remover(chave, no.getEsq()));
         } else if (no.getEsq() == null) {
             return no.getDir();
@@ -86,15 +80,15 @@ public class ArvoreABB {
      * balanceamento
      */
 
-    public NoABB pesquisar (Long chave) {
+    public NoABB pesquisar (String chave) {
         return pesquisar (chave, this.raiz);
     }
-    private NoABB pesquisar (Long chave, NoABB no) {
+    private NoABB pesquisar (String chave, NoABB no) {
         if (no == null) {
             return null;
         } else if (Objects.equals(chave, no.getItem().getChave())) {
             return no;
-        } else if (chave > no.getItem().getChave()) {
+        } else if ((chave.compareTo(no.getItem().getChave()) > 0)) {
             return pesquisar(chave, no.getDir());
         } else {
             return pesquisar(chave, no.getEsq());
@@ -103,7 +97,7 @@ public class ArvoreABB {
 
 
     public VetorItem CamCentral () {
-        VetorItem vetor = new VetorItem(InitABB.tamanho);
+        VetorItem vetor = new VetorItem(this.quant);
         return (fazCamCentral(this.raiz, vetor));
     }
 
@@ -127,7 +121,10 @@ public class ArvoreABB {
         int meio;
         if (inicio <= fim) {
             meio = (inicio+fim)/2;
-            arv.inserir(vetor.get(meio));
+            Item item = vetor.get(meio);
+            if (item != null) {
+                arv.inserir(item);
+            }
             // balancear a parte esquerda do vetor
             balancear (vetor, arv, inicio, meio-1);
             // balancear a parte direita do vetor
@@ -135,51 +132,29 @@ public class ArvoreABB {
         }
     }
 
-    /*
-     TESTE
-     */
+    public NoABB[] percorrerEmOrdem() {
+        NoABB[] vetorNos = new NoABB[contarNos(raiz)]; // Tamanho do vetor é o número total de nós
+        int[] indice = {0}; // Usado para rastrear a posição atual no vetor
+        percorrerEmOrdemRecursivo(raiz, vetorNos, indice);
+        return vetorNos;
+    }
 
-    private double pesquisarCpfRec(NoABB no, String cpf, FileWriter resultadoFile) throws IOException {
+    private void percorrerEmOrdemRecursivo(NoABB no, NoABB[] vetorNos, int[] indice) {
+        if (no != null) {
+            percorrerEmOrdemRecursivo(no.getEsq(), vetorNos, indice);
+            vetorNos[indice[0]++] = no;
+            percorrerEmOrdemRecursivo(no.getDir(), vetorNos, indice);
+        }
+    }
+
+    // Método para contar o número total de nós na árvore
+    public int contarNos(NoABB no) {
         if (no == null) {
-            resultadoFile.write("CPF " + cpf + ":\nINEXISTENTE\n\n");
-            return 0.0;  // Retorna 0.0 se o CPF não for encontrado
+            return 0;
         }
-
-        double saldoTotal = 0.0;
-
-        if (parseLong(cpf) < no.getItem().getChave()) {
-            saldoTotal += pesquisarCpfRec(no.getEsq(), cpf, resultadoFile);
-        } else if (parseLong(cpf) > no.getItem().getChave()) {
-            saldoTotal += pesquisarCpfRec(no.getDir(), cpf, resultadoFile);
-        } else {
-            // CPF encontrado
-            resultadoFile.write("CPF " + cpf + ":\n");
-            saldoTotal += escreverInformacoes(no, resultadoFile);
-            resultadoFile.write("Saldo Total: " + saldoTotal + "\n\n");
-        }
-
-        return saldoTotal;
+        return 1 + contarNos(no.getEsq()) + contarNos(no.getDir());
     }
 
-    public void pesquisarCpf(String cpf, FileWriter resultadoFile) throws IOException {
-        pesquisarCpfRec(raiz, cpf, resultadoFile);
-    }
 
-    private double escreverInformacoes(NoABB no, FileWriter resultadoFile) throws IOException {
-        double saldoTotal = no.getItem().getSaldo();
-
-        resultadoFile.write("Agencia: " + no.getItem().getAgencia()+
-                                " Conta: " + no.getItem().getNumero()+
-                                " Saldo: " + no.getItem().getSaldo() + "\n");
-
-        if (no.getEsq() != null) {
-            saldoTotal += escreverInformacoes(no.getEsq(), resultadoFile);
-        }
-        if (no.getDir() != null) {
-            saldoTotal += escreverInformacoes(no.getDir(), resultadoFile);
-        }
-
-        return saldoTotal;
-    }
 
 }

@@ -3,36 +3,24 @@ package sarrussys.main.arvoreABB;
 import sarrussys.main.models.Item;
 
 public class VetorItem {
-    private Item[] vetor;
-    private int tamanho;
+    private Item [] vetorItem;
+    private int quant;
 
-    public VetorItem(int capacidade) {
-        vetor = new Item[capacidade];
-        tamanho = 0;
+    public VetorItem(int tamanho){
+        this.vetorItem = new Item[tamanho];
+        this.quant = 0;
     }
+
 
     public void inserir(Item item) {
-        if (tamanho < vetor.length) {
-            vetor[tamanho] = item;
-            tamanho++;
-        } else {
-            // Se o vetor estiver cheio, você pode considerar redimensioná-lo ou lançar uma exceção.
-            System.out.println("O vetor está cheio. Não é possível adicionar mais itens.");
-        }
+        this.vetorItem[quant] = item;
+        this.quant++;
     }
 
-    public Item get(int indice) {
-        if (indice >= 0 && indice < tamanho) {
-            return vetor[indice];
-        } else {
-            // Você pode lançar uma exceção ou retornar um valor padrão, dependendo do seu caso de uso.
-            System.out.println("Índice inválido. Retornando null.");
-            return null;
-        }
+    public Item [] getVetorItem(){
+        return this.vetorItem;
     }
-
-    public int tamanho() {
-        return tamanho;
+    public Item get(int meio) {
+        return this.vetorItem[meio];
     }
 }
-
