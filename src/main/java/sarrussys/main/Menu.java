@@ -25,7 +25,7 @@ public class Menu {
             System.out.println("[ 3 ] Rodar Árvore ABB");
             System.out.println("[ 4 ] Rodar Árvore AVL");
             System.out.println("[ 5 ] Rodar Hashing");
-            System.out.println("[ 6 ] Rodar Todos com Todos os arquivos - CUIDADO");
+            System.out.println("[ 6 ] Rodar Todos com Todos os arquivos - >>> CUIDADO <<<");
             System.out.println("[ 0 ] Sair");
 
             System.out.print("Digite o número da opção desejada: ");

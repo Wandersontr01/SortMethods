@@ -95,10 +95,6 @@ public class InitHash {
                     double saldoTotal = 0.0;
                     boolean cpfJaFoiPesquisado = cpfsJaPesquisado.contains(resultadoPesquisaNaTabela.getChave());
 
-                    if(cpfParaPesquisar.equals("89786568471") && cpfsJaPesquisado.contains("89786568471")){
-                        System.out.println("Acho");
-                    }
-
                     if(!cpfJaFoiPesquisado){
                         resultadoFile.write("CPF " + cpfParaPesquisar + ":\n");
                         List<DadosBancarios> dadosBancariosList = resultadoPesquisaNaTabela.getContas();
