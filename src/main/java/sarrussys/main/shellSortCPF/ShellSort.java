@@ -1,88 +1,106 @@
 package sarrussys.main.shellSortCPF;
 
 import sarrussys.main.FilePath;
+import sarrussys.main.models.ItemParaOrdenacao;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
 
 public class ShellSort {
-
-    public ShellSort(FilePath filePath) throws Exception {
-        sortFile(filePath.getFilePath());
+    private final String nomeArquivo;
+    public ShellSort(FilePath filePath, int tamanho, String nomeArquivo) throws Exception {
+        this.nomeArquivo = nomeArquivo;
+        lerArquivoCPFs(filePath.getFilePath(), tamanho);
     }
 
-    public static void sortFile(String fileName) throws Exception {
-        Path inputPath = Paths.get(fileName);
-        Path outputPath = inputPath.resolveSibling("RESULTADOS_SHELLSORT").resolve(inputPath.getFileName().toString());
+    private void lerArquivoCPFs(String arquivosCPFs, int tamanho) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(arquivosCPFs));
+        String linha;
+        int posicaoParaInserir = 0;
+        ItemParaOrdenacao[] vetorCpfs = new ItemParaOrdenacao[tamanho];
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath.toString()))) {
+        while((linha = reader.readLine()) != null){
+            String[] dados = linha.split(";");
+            if (dados.length == 4) {
+                String cpf = dados[3];
+                String agencia = dados[0];
+                String numero = dados[1];
+                String saldo = dados[2];
 
-            String line;
-            String[] records = new String[50000];
-            int count = 0;
-
-            while ((line = reader.readLine()) != null) {
-                records[count++] = line;
+                ItemParaOrdenacao item = new ItemParaOrdenacao(cpf, agencia, numero, saldo);
+                vetorCpfs[posicaoParaInserir] = item;
+                posicaoParaInserir++;
             }
 
-            reader.close();
+        }
+        shellsort(vetorCpfs, tamanho);
+    }
 
-            shellsort(records, count);
+    public void shellsort(ItemParaOrdenacao [] vetor, int quant) throws IOException {
+        int i, j, h;
+        ItemParaOrdenacao temp;
+        h = 1;
 
-            for (int i = 0; i < count; i++) {
-                writer.write(records[i]);
-                writer.newLine();
+        do{
+            h = 3*h+1;
+        }while (h < quant);
+        do{
+            h = h/3;
+            for (i=h; i < quant; i++){
+                temp = vetor[i];
+                j = i;
+                while (vetor[j-h].getChave().compareTo( temp.getChave()) > 0){
+                    vetor[j] = vetor[j-h];
+                    j -= h;
+                    if (j < h) {
+                        break;
+                    }
+                }
+                vetor [j] = temp;
             }
+        }while (h != 1);
+        gravarArquivoOrdenado(vetor);
+    }
 
-        } catch (Exception e) {
+    private void gravarArquivoOrdenado(ItemParaOrdenacao [] vetorCpfs) {
+        try {
+
+            String caminhoResultado = "src/main/resources/RESULTADOS_SHELLSORT/" + this.nomeArquivo + ".txt";
+            FileWriter arquivoResultado = new FileWriter(caminhoResultado);
+
+            vetorCpfs = ordenaPorAgencia(vetorCpfs);
+
+            for(ItemParaOrdenacao item: vetorCpfs){
+                String agencia = item.getAgencia();
+                String conta = item.getNumero();
+                String saldo = item.getSaldo();
+                String cpf = item.getChave();
+                String toString = agencia+";"+conta+";"+saldo+";"+cpf+"\n";
+                arquivoResultado.write(toString);
+            }
+            arquivoResultado.close();
+        }catch (Exception e){
             e.printStackTrace();
         }
+
+
+
     }
 
-    public static void shellsort(String[] records, int count) {
-        int h = 1;
+    private static ItemParaOrdenacao[] ordenaPorAgencia(ItemParaOrdenacao[] vetorCpfs) {
 
-        while (h < count / 3) {
-            h = 3 * h + 1;
-        }
-
-        while (h >= 1) {
-            for (int i = h; i < count; i++) {
-                for (int j = i; j >= h && compareCPFs(records[j - h], records[j]) > 0; j -= h) {
-                    swap(records, j, j - h);
+        // Ordena o vetor pelo CPF, mantendo a ordem original dos cpfs iguais
+        for (int i = vetorCpfs.length - 1; i >= 0; i--) {
+            for (int j = 0; j < i; j++) {
+                if (vetorCpfs[j].getChave().equals(vetorCpfs[j + 1].getChave())) {
+                    if (vetorCpfs[j].getAgencia().compareTo(vetorCpfs[j + 1].getAgencia()) > 0) {
+                        ItemParaOrdenacao itemTemporario = vetorCpfs[j];
+                        vetorCpfs[j] = vetorCpfs[j + 1];
+                        vetorCpfs[j + 1] = itemTemporario;
+                    }
                 }
             }
-            h = h / 3;
-        }
-    }
-
-    public static void swap(String[] records, int i, int j) {
-        String temp = records[i];
-        records[i] = records[j];
-        records[j] = temp;
-    }
-
-    public static int compareCPFs(String record1, String record2) {
-        String[] fields1 = record1.split(";");
-        String[] fields2 = record2.split(";");
-
-        String cpf1 = fields1[3];
-        String cpf2 = fields2[3];
-
-        int cpfComparison = cpf1.compareTo(cpf2);
-
-        // Se os CPFs são iguais, compare pela agência e número da conta
-        if (cpfComparison == 0) {
-            String account1 = fields1[1] + fields1[2]; // Agência + Número da conta
-            String account2 = fields2[1] + fields2[2];
-            return account1.compareTo(account2);
         }
 
-        return cpfComparison;
+        return vetorCpfs;
     }
 }

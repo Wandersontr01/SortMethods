@@ -1,53 +1,40 @@
 package sarrussys.main.hashing;
 
-import java.util.Arrays;
+import sarrussys.main.models.Item;
+
+import java.util.LinkedList;
 
 public class Tabela {
-    private static final int tamanho_tabela = 557;
-    private NoHash[] tabela;
+    private static final int TAMANHO_TABELA = 1000; // Tamanho arbitrário da tabela
+
+    private LinkedList<Item>[] tabela;
 
     public Tabela() {
-        tabela = new NoHash[tamanho_tabela];
-    }
-
-    private int hash(String chave) {
-        int valorHash = 0;
-        for (int i = 0; i < chave.length(); i++) {
-            valorHash = 31 * valorHash + chave.charAt(i);
+        tabela = new LinkedList[TAMANHO_TABELA];
+        for (int i = 0; i < TAMANHO_TABELA; i++) {
+            tabela[i] = new LinkedList<>();
         }
-        return Math.abs(valorHash) % tamanho_tabela;
     }
 
-    public void inserir(String cpf, String agencia, String conta, double saldo) {
-        int indice = hash(cpf);
-        NoHash novoNo = new NoHash(cpf, agencia, conta, saldo);
+    private int calcularHash(String chave) {
+        // Implementação simples de função de hash
+        return Math.abs(chave.hashCode() % TAMANHO_TABELA);
+    }
 
-        if (tabela[indice] == null) {
-            tabela[indice] = novoNo;
-        } else {
-            NoHash atual = tabela[indice];
-            while (atual.proximo != null) {
-                atual = atual.proximo;
+    public void inserirItem(Item item) {
+        int indice = calcularHash(item.getChave());
+        tabela[indice].add(item);
+    }
+
+    public Item pesquisarPorCPF(String cpf) {
+        int indice = calcularHash(cpf);
+        LinkedList<Item> lista = tabela[indice];
+
+        for (Item item : lista) {
+            if (item.getChave().equals(cpf)) {
+                return item;
             }
-            atual.proximo = novoNo;
         }
-    }
-
-    public NoHash buscar(String cpf) {
-        int indice = hash(cpf);
-        NoHash atual = tabela[indice];
-
-        while (atual != null) {
-            if (atual.cpf.equals(cpf)) {
-                return atual;
-            }
-            atual = atual.proximo;
-        }
-
-        return null;
-    }
-
-    public int getTamanho_tabela(){
-        return this.getTamanho_tabela();
+        return null; // Não encontrado
     }
 }
