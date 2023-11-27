@@ -1,29 +1,33 @@
 package sarrussys.main.arvoreABB;
 
 import sarrussys.main.FilePath;
-import sarrussys.main.models.Item;;
+import sarrussys.main.models.DadosBancarios;
+import sarrussys.main.models.Item;
+import sarrussys.main.models.LerArquivoCPFs;;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import static java.lang.Long.parseLong;
+import static java.lang.Double.parseDouble;
 
 public class InitABB {
     public static int tamanho = 0;
     public InitABB(FilePath flp){
         try{
             ArvoreABB arvoreABB = new ArvoreABB();
+            LerArquivoCPFs lerArquivoCPFs = new LerArquivoCPFs();
+
             String filePath = flp.getFilePath();
             String cpfFilePath = FilePath.filecpfs.getFilePath();
 
             // Carregar dados para a ABB
             carregarDados(filePath, arvoreABB);
 
-            //LER ARQUIVO DE CPFS PARA PESQUISAR OK
-            String [] cpfsParaPesquisar = lerArquivoCPFs(cpfFilePath);
+            //LER ARQUIVO DE CPFS PARA PESQUISAR
+            String [] cpfsParaPesquisar = lerArquivoCPFs.lerArquivoCPFs(cpfFilePath);
 
+            //balanceando arvore
             arvoreABB.balancear();
 
             // Criar arquivo único para resultados dentro da pasta RESULTADOS_ARVOREABB
@@ -37,11 +41,9 @@ public class InitABB {
         }catch (Exception e){
             e.printStackTrace();
         }
-
-
     }
 
-    private static void carregarDados(String arquivo, ArvoreABB arvoreABB) throws IOException {
+    private void carregarDados(String arquivo, ArvoreABB arvoreABB) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(arquivo));
         String linha;
 
@@ -54,59 +56,70 @@ public class InitABB {
                 String numero = dados[1];
                 String saldo = dados[2];
 
-                Item item = new Item(cpf,agencia,numero,saldo);
+                //INSTANCIANDO O NOVO ITEM
+                Item itemNovo = new Item(cpf);
+                //INSTANCIANDO O DADO BANCARIO DO NOVO CPF
+                DadosBancarios dadosBancarios = new DadosBancarios(agencia, numero, saldo);
+                //PESQUISANDO PARA SABER SE O NOVO CPF JÁ EXISTE
+                NoABB itemExistente = arvoreABB.pesquisar(cpf);
 
-                arvoreABB.inserir(item);
+                if( itemExistente != null){
+                    //se o cpf a ser inserido já existe
+                    //insere dados bancarios na lista de contas do item
+                    itemExistente.getItem().setContas(dadosBancarios);
+                }else {
+                    //se o cpf nao existe na arvore
+                    //insere os dados bancarios na lista de contas do item
+                    //adiciona o item na arvore
+                    itemNovo.setContas(dadosBancarios);
+                    arvoreABB.inserir(itemNovo);
+                }
             }
         }
         reader.close();
     }
 
-    private static String[] lerArquivoCPFs(String arquivosCPFs) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(arquivosCPFs));
-        String linha;
-        String [] vetorCpfsParaPesquisar = new String[400];
-        int posicao = 0;
-
-        while((linha = reader.readLine()) != null){
-            vetorCpfsParaPesquisar[posicao] = linha.trim();
-            posicao++;
-        }
-        return vetorCpfsParaPesquisar;
-    }
-
-
     private static void gerarArquivoDeSaida(String[] cpfsParaPesquisar, FileWriter resultadoFile, ArvoreABB arvoreABB) {
-        NoABB[] todosOsRegistros;
-        todosOsRegistros = arvoreABB.percorrerEmOrdem();
 
         try {
+            List<String> cpfsJaPesquisado = new ArrayList<>();
             for (String cpfParaPesquisar : cpfsParaPesquisar) {
-                resultadoFile.write("CPF " + cpfParaPesquisar + ":\n");
-                // Realizar a pesquisa
-                boolean existe = false;
-                double saldoTotal = 0.0;
-                for (int i = 0; i < todosOsRegistros.length; i++) {
+                NoABB resultadoDaPesquisaNaArvore = arvoreABB.pesquisar(cpfParaPesquisar);
 
-                    if (cpfParaPesquisar.compareTo(todosOsRegistros[i].getItem().getChave()) == 0){
+                if(resultadoDaPesquisaNaArvore == null){
+                    resultadoFile.write("CPF " + cpfParaPesquisar + ":\n");
+                    //SE O CPF NAO EXISTIR NA ARVORE PRINTA INEXISTENTE
+                    resultadoFile.write("INEXISTENTE\n\n");
+                }else{
+                    // Realizar a pesquisa
+                    //se o cpf existe na arvore
+                    //CRIA UMA LISTA PARA PUXAR TODOS OS DADOS BANCARIOS DESSE CPF
+                    //PERCORRE A LISTA PRINTANDO TODOS OS DADOS BANCARIOS
+                    double saldoTotal = 0.0;
+                    boolean cpfJaFoiPesquisado = cpfsJaPesquisado.contains(resultadoDaPesquisaNaArvore.getItem().getChave());
 
-                        resultadoFile.write("Agencia: " + todosOsRegistros[i].getItem().getAgencia() +
-                                " Conta: " + todosOsRegistros[i].getItem().getNumero() +
-                                " Saldo: " + todosOsRegistros[i].getItem().getSaldo() + "\n");
-                        existe = true;
-                        saldoTotal += todosOsRegistros[i].getItem().getSaldo();
+                    if (!cpfJaFoiPesquisado) {
+                        resultadoFile.write("CPF " + cpfParaPesquisar + ":\n");
+                        List<DadosBancarios> dadosBancariosList = resultadoDaPesquisaNaArvore.getItem().getContas();
+
+                        for (DadosBancarios dado : dadosBancariosList) {
+                            resultadoFile.write(
+                                    "Agencia: " + dado.getAgencia() +
+                                            " Conta: " + dado.getNumero() +
+                                            " Saldo: " + dado.getSaldo() + "\n");
+                            saldoTotal += parseDouble(dado.getSaldo());
+                        }
+                        resultadoFile.write("Saldo Total: " + saldoTotal + "\n\n");
+                        cpfsJaPesquisado.add(resultadoDaPesquisaNaArvore.getItem().getChave());
+
                     }
                 }
-                if(existe){
-                    resultadoFile.write("Saldo Total: "+ saldoTotal+"\n\n");
-                }else{
-                    resultadoFile.write("INEXISTENTE\n\n");
-                }
             }
-
+            resultadoFile.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
 }

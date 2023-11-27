@@ -6,6 +6,7 @@ public class NoABB {
     private Item item;
     private NoABB esq, dir;
 
+
     public NoABB(Item item) {
         this.item = item;
     }
