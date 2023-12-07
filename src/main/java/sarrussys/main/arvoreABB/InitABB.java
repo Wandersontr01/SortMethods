@@ -3,7 +3,7 @@ package sarrussys.main.arvoreABB;
 import sarrussys.main.FilePath;
 import sarrussys.main.models.DadosBancarios;
 import sarrussys.main.models.Item;
-import sarrussys.main.models.LerArquivoCPFs;;
+import sarrussys.main.models.LerArquivoCPFs;
 
 import java.io.*;
 import java.util.ArrayList;

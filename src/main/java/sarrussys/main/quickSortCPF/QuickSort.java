@@ -41,6 +41,7 @@ public class QuickSort {
 
     public void quicksort (ItemParaOrdenacao [] vetor, int tamanho){
         ordena (vetor,0, tamanho-1);
+        gravarArquivoOrdenado(vetor);
     }
 
     private void ordena (ItemParaOrdenacao [] vetor, int esq, int dir){
@@ -67,8 +68,6 @@ public class QuickSort {
 
         if (dir > i)
             ordena(vetor, i, dir);
-
-        gravarArquivoOrdenado(vetor);
     }
 
     private void gravarArquivoOrdenado(ItemParaOrdenacao[] vetorCpfs) {
